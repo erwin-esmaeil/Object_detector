@@ -1,5 +1,24 @@
+from abc import ABC, abstractmethod
 import cv2
 from ultralytics import YOLO
+
+
+
+class BaseDetector(ABC):
+
+    @abstractmethod
+    def detect(self, frame):
+        pass
+
+    @abstractmethod
+    def draw(self, frame, results):
+        pass
+
+
+
+
+
+
 
 # Load the YOLO model
 model = YOLO("yolov8n.pt")
