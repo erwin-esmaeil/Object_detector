@@ -1,54 +1,29 @@
-from abc import ABC, abstractmethod
 import cv2
-from ultralytics import YOLO
 
+from core.camera import Camera
+from core.detector_manager import DetectorManager
 
+from detectors.face_detector import FaceDetector
 
-class BaseDetector(ABC):
+camera = Camera()
 
-    @abstractmethod
-    def detect(self, frame):
-        pass
+manager = DetectorManager()
 
-    @abstractmethod
-    def draw(self, frame, results):
-        pass
+manager.add_detector(FaceDetector())
 
+while True:
 
+    ret, frame = camera.read()
 
-
-
-
-
-# Load the YOLO model
-model = YOLO("yolov8n.pt")
-
-# Open camera (0 is default webcam)
-cap = cv2.VideoCapture(0)
-
-while cap.isOpened():
-    success, frame = cap.read()
-    if not success:
+    if not ret:
         break
 
-    # Run YOLO detection on the current frame
-    results = model(frame, stream=True)
+    frame = manager.process(frame)
 
-    # Visualize results on the frame
-    for r in results:
-        annotated_frame = r.plot()
-        
-    # Display the frame
-    cv2.imshow("YOLO Live Detection", annotated_frame)
+    cv2.imshow("Vision", frame)
 
-    # Press 'q' on the keyboard to exit
-    if cv2.waitKey(1) & 0xFF == ord("q"):
+    if cv2.waitKey(1) == 27:
         break
 
-cap.release()
+camera.release()
 cv2.destroyAllWindows()
-
-
-
-
-
